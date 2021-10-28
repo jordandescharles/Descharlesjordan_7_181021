@@ -21,29 +21,28 @@ function displayRecipe(allRecipes){
 
 // affichage des plats avec Littéraux de gabarits 
 function pageDesign(recipes){
-     searchApp(recipes.appliance);
-     CreateUstList(recipes.ustensils);
-    
-    return `<article>
-       <img src="/img/a.jpg" alt="placeholderimg">
-       <div class="titleArticle">
-           <h2>${recipes.name}</h2><span><i class="fa-regular fa-clock"></i> ${recipes.time} min</span>
-           </div>
-           <div class="basArticle">
-               <p class="ingredientsArticle">
-               ${ingredientsList(recipes.ingredients)}
-               </p>
-               <p class="recetteArticle">  ${recipes.description}</p>
-       </div>
-   </article>
-   ` } 
-   function ingredientsList(a){
-       return `${a.map(listIngre).join('')}`
-   } 
-   function listIngre(a){
+    searchApp(recipes.appliance);
+    CreateUstList(recipes.ustensils);
+    return `
+        <article>
+            <img src="/img/a.jpg" alt="placeholderimg">
+            <div class="titleArticle">
+                <h2>${recipes.name}</h2><span><i class="fa-regular fa-clock"></i> ${recipes.time} min</span>
+            </div>
+            <div class="basArticle">
+               <p class="ingredientsArticle">${ingredientsList(recipes.ingredients)}</p>
+               <p class="recetteArticle">${recipes.description}</p>
+            </div>
+        </article>
+    ` 
+} 
+function ingredientsList(a){
+    return `${a.map(listIngre).join('')}`
+} 
+function listIngre(a){
     if (a.hasOwnProperty("quantity") && a.hasOwnProperty("unit")){
         searchIngred (a.ingredient);
-       return `<strong>${a.ingredient}</strong> : ${a.quantity} ${a.unit}  </br> `
+        return `<strong>${a.ingredient}</strong> : ${a.quantity} ${a.unit}</br> `
     }
     else if (a.hasOwnProperty("unit") == false && a.hasOwnProperty("quantity")){
         searchIngred (a.ingredient);
@@ -53,7 +52,7 @@ function pageDesign(recipes){
         searchIngred (a.ingredient);
         return `<strong>${a.ingredient}</strong>  </br> `
     }
-   }
+}
 
 // SEARCH ingredients /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,8 +65,7 @@ function searchIngred (ingred){
     IngredTable.sort();
 }
 
-//////////////////////////////////////////////////////////////////////////
-  function displayIngre(){
+function displayIngre(){
     document.getElementById("formBlue").classList.remove('miniform');
     document.getElementById("formBlue").classList.add('maxiform');
     document.getElementById("buttonDown").innerHTML = `<i class="fa-solid fa-angle-up"  onclick="CloseIngre()"></i>`;
@@ -75,16 +73,14 @@ function searchIngred (ingred){
         return listDesign(listIngredients)
     }).join('')}` 
   }
-  function listDesign(a){
-    return `
-   <li>${a}</li>
-   ` } 
+function listDesign(a){
+    return `<li>${a}</li> ` } 
 
 function CloseIngre(){ 
-   document.getElementById("formBlue").classList.remove('maxiform');
-   document.getElementById("formBlue").classList.add('miniform');
-   document.getElementById("buttonDown").innerHTML = `<i class="fa-solid fa-angle-down"  onclick="displayIngre()"></i>`;
-   document.getElementById("blue").innerHTML = ``;
+    document.getElementById("formBlue").classList.remove('maxiform');
+    document.getElementById("formBlue").classList.add('miniform');
+    document.getElementById("buttonDown").innerHTML = `<i class="fa-solid fa-angle-down"  onclick="displayIngre()"></i>`;
+    document.getElementById("blue").innerHTML = ``;
 } 
 
 
@@ -103,14 +99,12 @@ function displayApp(){
     document.getElementById("formGreen").classList.remove('miniform');
     document.getElementById("formGreen").classList.add('maxiform');
     document.getElementById("buttonDownGreen").innerHTML = `<i class="fa-solid fa-angle-up"  onclick="CloseApp()"></i>`;
-    document.getElementById("green").innerHTML = `${AppTable.map(function (listApp){
-        return listDesign(listApp)
+    document.getElementById("green").innerHTML = `${AppTable.map(function(listApp){
+        return listDesign(listApp);
     }).join('')}` 
   }
   function listDesign(a){
-    return `
-   <li>${a}</li>
-   ` } 
+    return `<li>${a}</li>` } 
 
 function CloseApp(){ 
    document.getElementById("formGreen").classList.remove('maxiform');
@@ -122,6 +116,7 @@ function CloseApp(){
 // SEARCH Ustensiles /////////////////////////////////////////////////////////////////////////////////////////////////////////
 function  CreateUstList(ust){
    UstArray.push(ust) // recup un array avec tous les arrays
+   console.log(UstArray[0][1])
 }
 function searchUst(){ 
     for(i=0; i<UstArray.lenght ; i++){

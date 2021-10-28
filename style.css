@@ -75,19 +75,19 @@ menu form {
     font: 16px;
     color: #ffffff;
     height: 100%;
-   
     width: 100%;
     padding: 0px 10px;
     text-align: left;
   }
-menu button {
+menu span {
     all: unset;
     text-align: center;
     cursor: pointer;
     width: 44px;
     height: 44px;
+    line-height: 50px;
   }
-menu button i{
+menu span i{
     color : #ffffff;
     font-size:22px;
   }
