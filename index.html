@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Les Petits Plats</title>
+<meta name="description" content="site de recettes">
+<link rel="stylesheet" type="text/css" href="style.css">
+
+<script src="https://kit.fontawesome.com/cff89baa8e.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<header>
+    <img src="/img/logo.png" alt="logo site">
+    <h1>Les petits plats</h1> 
+    <form class="form" role="search">
+        <input type="search" id="searchTop" name="research" placeholder="Rechercher un ingrédient, appareil, ustensiles ou une recette"aria-label="barre de recherche">
+        <button><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+</header>
+<div id="tags">
+    <span class="tagSelected">Coco <i class="fa-regular fa-circle-xmark"></i></span>
+</div>
+<menu>
+    <div id="formBlue" class="miniform blue">
+    <form role="search">
+        <input type="search" id="searchBlue" name="ingedients" placeholder="Ingrédient" aria-label="barre de recherche ingrédient">
+        <button id="buttonDown"><i class="fa-solid fa-angle-down" onclick="displayIngre()"></i></button> </br>
+        </form>
+   <div class="list blue">
+ <ul id="blue"></ul>
+</div>
+    </div>
+    <div id="formGreen" class="miniform green">
+    <form role="search">
+        <input type="search" id="searchGreen" name="ingedients" placeholder="Appareil" aria-label="barre de recherche ingrédient">
+        <button id="buttonDownGreen"><i class="fa-solid fa-angle-down" onclick="displayApp()"></i></button>
+    </form>
+    <div class="list green">
+        <ul id="green"></ul> </div>
+</div>
+    <div id="formRed" class="miniform red" >
+    <form role="search">
+        <input type="search" id="searchRed" name="ingedients" placeholder="Ustensiles" aria-label="barre de recherche ingrédient">
+        <button><i class="fa-solid fa-angle-down" onclick="searchUst()"></i></button>
+    </form>
+    <div class="list red">
+        <ul id="red"></ul>
+    </div>
+</div>
+</menu>
+<main id="listRecipes">
+
+
+</main>
+
+
+</body><script src="script.js"></script>
+</html>
