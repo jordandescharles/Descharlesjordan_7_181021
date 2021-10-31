@@ -33,6 +33,7 @@ function displayRecipe(allRecipes){
 function pageDesign(recipesMap){
     searchApp(recipesMap.appliance);
     CreateUstList(recipesMap.ustensils);
+    searchUst();
     return `
         <article>
             <img src="/img/a.jpg" alt="placeholderimg">
@@ -92,7 +93,7 @@ function displayIngre(){
         return listDesignBlue(listIngredients) // Map tous les liens de la liste d'ingrédients
     }).join('')}`     
   }
-
+ 
 function listDesignBlue(a){
     return `<li id="${a}List" onclick="filterTag( '${a}','blue')">${a} </li>` }  // on passe le nom et la couleur de fond en parametre
 
@@ -158,7 +159,14 @@ function searchUst(){  // fonction qui met tous les ustensiles dans 1 seul array
         }
     }  
     UstTable.sort();
-    displayUst()
+}
+// fonction pour utiliser la recherche top combinée au ustensils
+function displayUstTOP(app){
+    var a = app ;
+    var lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+    if(UstTable.includes(lower)==false){
+        UstTable.push(lower);}
+    UstTable.sort();
 }
  
 function displayUst(){
@@ -193,6 +201,7 @@ searchTop.addEventListener("keyup", function(event) {
     }
     if (event.keyCode == 8 && counter == 1){
         displayRecipe(allRecipes) ; //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes
+        
     }
     if (event.keyCode == 8){
         --counter// si backspace on décrémente  
@@ -209,26 +218,48 @@ searchTop.addEventListener("keyup", function(event) {
 
 
 function filterTop(){
+    IngredTable=[];// on vide l'array des ingrédients pour afficher la recherche
+    AppTable=[]; 
+    UstTable=[];
+
     main.innerHTML = `${allRecipes.map(function (recipeFilterTop){
         return pageDesignFiltered(recipeFilterTop)
     }).join('')}`
-checkIfEmpty(); // verifie si on a un résultat
+
+    checkIfEmpty(); // verifie si on a un résultat
 }
 
 function pageDesignFiltered(r){ 
     // explication nomenclature : reci pour recipe et Desc pour description
-    // Lower case pour faciliter la recherche    
+    // Lower case pour faciliter la recherche  
+    var a =[]; 
+    var b=[]; 
     var reciDesc = r.description.toLowerCase();
     var reciName = r.name.toLowerCase();
     // on map le resultat d'ingredients pour recuperer tout dans 1 array + lowercase + join
     var reciIngre = r.ingredients;
-    var a =[];
+    var reciUst = r.ustensils;
+    
     for(i=0; i<reciIngre.length; i++){
         a.push(r.ingredients[i].ingredient)
+    } 
+    for(i=0; i<reciUst.length; i++){
+        b.push(reciUst[i])
     } 
     var reciIngre = a.map(e => e.toLocaleLowerCase()).join(' ');
     // si la rechercher est inclue dans le nom les ingredients ou la description
     if(reciName.includes(directInput) || reciIngre.includes(directInput) || reciDesc.includes(directInput) ){
+
+        // boucle qui permet de mettre a jour le filtre ingredient a la saisie
+        for(i=0; i<a.length ; i++){
+            searchIngred(a[i]);
+        }
+         // permet de mettre a jour le filtre Appareil a la saisie
+            searchApp(r.appliance);
+         // boucle qui permet de mettre a jour le filtre ingredient a la saisie
+         for(i=0; i<b.length ; i++){
+            displayUstTOP(b[i]);
+        }         
     //searchApp(AppTable);
     //CreateUstList(UstTable);
     return `
