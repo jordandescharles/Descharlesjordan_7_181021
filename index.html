@@ -18,7 +18,6 @@
       </form>
 </header>
 <div id="tags">
-    <span class="tagSelected">Coco <i class="fa-regular fa-circle-xmark"></i></span>
 </div>
 <menu>
     <div id="formBlue" class="miniform blue">
@@ -41,14 +40,14 @@
     <div id="formRed" class="miniform red" >
     <form role="search">
         <input type="search" id="searchRed" name="ingedients" placeholder="Ustensiles" aria-label="barre de recherche ingrédient">
-        <span><i class="fa-solid fa-angle-down" onclick="searchUst()"></i></span></br>
-    </div>
+        <span id="buttonDownRed"><i class="fa-solid fa-angle-down" onclick="searchUst()"></i></span></br>
+    </form>
+    <div class="list red">
+        <ul id="red"></ul> </div>
 </div>
+
 </menu>
-<main id="listRecipes">
-
-
-</main>
+<main id="listRecipes"></main>
 
 
 </body><script src="script.js"></script>

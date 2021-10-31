@@ -34,7 +34,7 @@ header form {
     font: 16px;
     color: #000000;
     height: 100%;
-    width: 50%;
+    width: 100%;
     padding: 6px 10px;
     text-align: left;
   }
@@ -162,13 +162,15 @@ margin-top: 30px;
     width: 100%;
     padding: 8px;
     color: #ffffff;
-    background-color: #3282F7;
+   
     border-radius: 5px;
     font-size: 15px;
+    margin-right: 10px;
 }
 .tagSelected i{
     color: #ffffff;
     font-size: 13px;
+    margin-left: 5px;
 }
 
 
@@ -179,8 +181,9 @@ main{
     margin-right: auto;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: start;
     flex-wrap: wrap;
+    gap: 75px;
     z-index: 1;
 }
 
@@ -240,4 +243,22 @@ display: inline;
     max-height: 128px;
     overflow-y: hidden;
     text-overflow: ellipsis;
+}
+div ul li:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}
+.disabled{
+    color: grey;
+    text-decoration: none;
+}
+.disabled:hover{
+    text-decoration: none;
+}
+#error{
+    font-size: 20px;
+    margin-left: auto;
+    margin-right: auto;
+   text-align: center;
+    color: grey;
 }
