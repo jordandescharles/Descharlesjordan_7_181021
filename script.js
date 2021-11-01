@@ -1,4 +1,5 @@
 var allRecipes = [];
+var allRecipesFiltered=[];
 var IngredTable = [];
 var AppTable  = [];
 var UstTable = [];
@@ -24,52 +25,97 @@ fetch('recipes.json')
         listIngre -- envoie la mise en page de chaque ingrédient a ingredientsList
 */
 
-function displayRecipe(allRecipes){ 
-    main.innerHTML = `${allRecipes.map(function (recipesMap){
-        return pageDesign(recipesMap)
-    }).join('')}` 
-}
 
-function pageDesign(recipesMap){
-    searchApp(recipesMap.appliance);
-    CreateUstList(recipesMap.ustensils);
-    searchUst();
-    return `
+function displayRecipe(allRecipes){ 
+    allRecipes.forEach(function(recipe){
+        var a =recipe.ingredients;
+        main.innerHTML += `
         <article>
             <img src="/img/a.jpg" alt="placeholderimg">
             <div class="titleArticle">
-                <h2>${recipesMap.name}</h2><span><i class="fa-regular fa-clock"></i> ${recipesMap.time} min</span>
+                <h2>${recipe.name}</h2><span><i class="fa-regular fa-clock"></i> ${recipe.time} min</span>
             </div>
-            <div class="basArticle">
-               <p class="ingredientsArticle">${ingredientsList(recipesMap.ingredients)}</p>
-               <p class="recetteArticle">${recipesMap.description}</p>
+            <div class="basArticle">               
+            <p class="ingredientsArticle" id="${recipe.id}"></p>
+            <p class="recetteArticle">${recipe.description}</p>
             </div>
         </article>
     ` 
+        a.forEach(function(ingre){
+            if (ingre.hasOwnProperty("quantity") && ingre.hasOwnProperty("unit")){
+                document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity} ${ingre.unit}</br> `;
+            }
+            else if (ingre.hasOwnProperty("unit") == false && ingre.hasOwnProperty("quantity")){
+                document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity}  </br> `;
+            }
+            else if (ingre.hasOwnProperty("quantity") == false && ingre.hasOwnProperty("unit") == false){
+                document.getElementById(recipe.id).innerHTML += `<strong>${ingre.ingredient}</strong>  </br> `;
+            }
+        });
+    });
 } 
-function ingredientsList(a){
-    return `${a.map(listIngre).join('')}`
-} 
-function listIngre(a){
-    if (a.hasOwnProperty("quantity") && a.hasOwnProperty("unit")){
-        searchIngred (a.ingredient);
-        return `<strong>${a.ingredient}</strong> : ${a.quantity} ${a.unit}</br> `
+
+// LISTENER top search bar
+
+var searchTop =document.getElementById("searchTop");
+var counter = 0;
+var directInput =""; // user input
+
+searchTop.addEventListener("keyup", function(event) {
+    
+    if (event.keyCode >= 65 && event.keyCode <= 90  ||event.keyCode ==50||event.keyCode ==55 ||event.keyCode ==48   ) { 
+        ++ counter; } //incrémente si on appuie sur une lettre uniquement é/è/à compris
+    if (event.keyCode == 8 &&  counter <= 3){
+        allRecipesFiltered=[];
+        main.innerHTML = ``;
+        displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes    
+    if (event.keyCode == 8){
+        --counter// si backspace on décrémente  
+        if (counter < 0){ counter = 0;} // empeche de passer counter en negatif 
     }
-    else if (a.hasOwnProperty("unit") == false && a.hasOwnProperty("quantity")){
-        searchIngred (a.ingredient);
-        return `<strong>${a.ingredient}</strong> : ${a.quantity}  </br> `
-    }
-    else if (a.hasOwnProperty("quantity") == false && a.hasOwnProperty("unit") == false){
-        searchIngred (a.ingredient);
-        return `<strong>${a.ingredient}</strong>  </br> `
+    if (counter >= 3){  // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
+        directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+        filterTop();
+    }  
+})
+
+function filterTop(){
+    allRecipes.forEach(function(recette){
+        var name= recette.name.toLowerCase();
+        var desc= recette.description.toLowerCase();
+        var ingredients= recette.ingredients;
+
+        ingredients.forEach(function(ingred){   
+            var ingredient = ingred.ingredient        
+            if(name.includes(directInput) || desc.includes(directInput) || ingredient.includes(directInput)){
+                if(allRecipesFiltered.includes(recette) == false){
+                allRecipesFiltered.push(recette);
+                }
+            } 
+        });
+    });
+
+    main.innerHTML = ``;
+    displayRecipe(allRecipesFiltered);
+    allRecipesFiltered=[];
+    checkIfEmpty();
+}
+
+function checkIfEmpty(){
+    if (main.hasChildNodes()== false) {
+        document.getElementById("listRecipes").innerHTML = `<p id="error">Aucune recette ne correspond à votre critère... 
+        </br>vous pouvez chercher « tarte aux pommes », « poisson », etc.</p>` ;
     }
 }
+
+
+
 
 /* SEARCH ingredients - couleur associée => Blue
     searchIngred a comme parametre l'ingrédient envoyé par listIngre au dessus;
     pour chaque ingredient on check si il est dans IngredTable si non on le push dedans;
     ensuite on trie par ordre alpha;
-*/
+
 
 // declaration des const utiles uniquement ici
 const formBlue = document.getElementById("formBlue");
@@ -187,9 +233,9 @@ function CloseUst(){
    red.innerHTML = ``;
 } 
 
-/* LISTENER top search bar
+// LISTENER top search bar
 
-*/
+
 var searchTop =document.getElementById("searchTop");
 var counter = 0;
 var directInput =""; // user input
@@ -299,4 +345,4 @@ function checkIfEmpty(){
         document.getElementById("listRecipes").innerHTML = `<p id="error">Aucune recette ne correspond à votre critère... 
         </br>vous pouvez chercher « tarte aux pommes », « poisson », etc.</p>` ;
     }
-}
+}*/
