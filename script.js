@@ -13,56 +13,44 @@ fetch('recipes.json')
 })
     .then((data) => {
         allRecipes = data.recipes;
-        displayRecipe(allRecipes) ;
-        
+        displayRecipe(allRecipes) ;    
 });
 
 /* affichage Principaldes plats avec Littéraux de gabarits 
-    displayRecipe --  MAP pour afficher les elements de pageDesign
-        pageDesign -- renvoie la mise en page d'un element "article"
-        ingredientsList -- sert a affficher les ingrédients
-        listIngre -- envoie la mise en page de chaque ingrédient a ingredientsList
 */
 
 function displayRecipe(allRecipes){ 
-    main.innerHTML = `${allRecipes.map(function (recipesMap){
-        return pageDesign(recipesMap)
-    }).join('')}` 
-}
 
-function pageDesign(recipesMap){
-    searchApp(recipesMap.appliance);
-    CreateUstList(recipesMap.ustensils);
-    searchUst();
-    return `
+    for(i=0;i<allRecipes.length; i++){
+        var a = allRecipes[i].ingredients;
+        main.innerHTML += `
         <article>
             <img src="/img/a.jpg" alt="placeholderimg">
             <div class="titleArticle">
-                <h2>${recipesMap.name}</h2><span><i class="fa-regular fa-clock"></i> ${recipesMap.time} min</span>
+                <h2>${allRecipes[i].name}</h2><span><i class="fa-regular fa-clock"></i> ${allRecipes[i].time} min</span>
             </div>
-            <div class="basArticle">
-               <p class="ingredientsArticle">${ingredientsList(recipesMap.ingredients)}</p>
-               <p class="recetteArticle">${recipesMap.description}</p>
+            <div class="basArticle">               
+            <p class="ingredientsArticle" id="${allRecipes[i].id}"></p>
+            <p class="recetteArticle">${allRecipes[i].description}</p>
             </div>
         </article>
     ` 
-} 
-function ingredientsList(a){
-    return `${a.map(listIngre).join('')}`
-} 
-function listIngre(a){
-    if (a.hasOwnProperty("quantity") && a.hasOwnProperty("unit")){
-        searchIngred (a.ingredient);
-        return `<strong>${a.ingredient}</strong> : ${a.quantity} ${a.unit}</br> `
-    }
-    else if (a.hasOwnProperty("unit") == false && a.hasOwnProperty("quantity")){
-        searchIngred (a.ingredient);
-        return `<strong>${a.ingredient}</strong> : ${a.quantity}  </br> `
-    }
-    else if (a.hasOwnProperty("quantity") == false && a.hasOwnProperty("unit") == false){
-        searchIngred (a.ingredient);
-        return `<strong>${a.ingredient}</strong>  </br> `
-    }
+        for(j=0; j<a.length;j++){
+
+            if (a[j].hasOwnProperty("quantity") && a[j].hasOwnProperty("unit")){
+                searchIngred (a[j].ingredient);
+                document.getElementById(allRecipes[i].id).innerHTML +=`<strong>${a[j].ingredient}</strong> : ${a[j].quantity} ${a[j].unit}</br> `;
+            }
+            else if (a[j].hasOwnProperty("unit") == false && a[j].hasOwnProperty("quantity")){
+                searchIngred (a[j].ingredient);
+                document.getElementById(allRecipes[i].id).innerHTML +=`<strong>${a[j].ingredient}</strong> : ${a[j].quantity}  </br> `;
+            }
+            else if (a[j].hasOwnProperty("quantity") == false && a[j].hasOwnProperty("unit") == false){
+                searchIngred (a[j].ingredient);
+                document.getElementById(allRecipes[i].id).innerHTML += `<strong>${a[j].ingredient}</strong>  </br> `;
+            }
+         }
+    }    
 }
 
 /* SEARCH ingredients - couleur associée => Blue
