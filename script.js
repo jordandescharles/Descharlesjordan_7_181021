@@ -4,6 +4,9 @@ var IngredTable = [];
 var AppTable  = [];
 var UstTable = [];
 var UstArray = [];
+var searchValue;
+var filterValue= [];
+var all = []; ;
 
 const main = document.getElementById("listRecipes");
 
@@ -15,7 +18,6 @@ fetch('recipes.json')
     .then((data) => {
         allRecipes = data.recipes;
         displayRecipe(allRecipes) ;
-        
 });
 
 /* affichage Principaldes plats avec Littéraux de gabarits 
@@ -24,11 +26,11 @@ fetch('recipes.json')
         ingredientsList -- sert a affficher les ingrédients
         listIngre -- envoie la mise en page de chaque ingrédient a ingredientsList
 */
-
-
-function displayRecipe(allRecipes){ 
-    allRecipes.forEach(function(recipe){
+function displayRecipe(recipes){ 
+    recipes.forEach(function(recipe){
         var a =recipe.ingredients;
+        searchApp(recipe.appliance);
+        CreateUstList(recipe.ustensils)
         main.innerHTML += `
         <article>
             <img src="/img/a.jpg" alt="placeholderimg">
@@ -44,12 +46,15 @@ function displayRecipe(allRecipes){
         a.forEach(function(ingre){
             if (ingre.hasOwnProperty("quantity") && ingre.hasOwnProperty("unit")){
                 document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity} ${ingre.unit}</br> `;
+                searchIngred (ingre.ingredient);
             }
             else if (ingre.hasOwnProperty("unit") == false && ingre.hasOwnProperty("quantity")){
-                document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity}  </br> `;
+                document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity}  </br> `
+                searchIngred (ingre.ingredient);;
             }
             else if (ingre.hasOwnProperty("quantity") == false && ingre.hasOwnProperty("unit") == false){
                 document.getElementById(recipe.id).innerHTML += `<strong>${ingre.ingredient}</strong>  </br> `;
+                searchIngred (ingre.ingredient);
             }
         });
     });
@@ -70,36 +75,54 @@ searchTop.addEventListener("keyup", function(event) {
         main.innerHTML = ``;
         displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes    
     if (event.keyCode == 8){
-        --counter// si backspace on décrémente  
-        if (counter < 0){ counter = 0;} // empeche de passer counter en negatif 
+        --counter// si backspace on décrémente 
+        searchValue=""; 
+        if (counter < 0){ 
+            counter = 0;
+        } // empeche de passer counter en negatif 
     }
     if (counter >= 3){  // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
         directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
-        filterTop();
+        searchValue=directInput;
+        IngredTable=[];
+        AppTable=[];
+        UstArray=[];
+        UstTable=[];
+        filterTop(directInput);
     }  
 })
 
-function filterTop(){
-    allRecipes.forEach(function(recette){
+
+
+function filterTop(a){
+    allRecipes.forEach(recette => {
         var name= recette.name.toLowerCase();
         var desc= recette.description.toLowerCase();
         var ingredients= recette.ingredients;
 
-        ingredients.forEach(function(ingred){   
-            var ingredient = ingred.ingredient        
-            if(name.includes(directInput) || desc.includes(directInput) || ingredient.includes(directInput)){
-                if(allRecipesFiltered.includes(recette) == false){
+        if(name.includes(a) || desc.includes(a)){
+            if(allRecipesFiltered.includes(recette) == false){
                 allRecipesFiltered.push(recette);
                 }
+            }       
+        ingredients.forEach(ingred =>{   
+            var ingredient = ingred.ingredient        
+            if(ingredient.includes(a)){
+                if(allRecipesFiltered.includes(recette) == false){
+                    allRecipesFiltered.push(recette);
+                    }
             } 
+        
         });
     });
-
     main.innerHTML = ``;
     displayRecipe(allRecipesFiltered);
-    allRecipesFiltered=[];
     checkIfEmpty();
-}
+    console.log(test)
+
+} 
+
+
 
 function checkIfEmpty(){
     if (main.hasChildNodes()== false) {
@@ -107,15 +130,11 @@ function checkIfEmpty(){
         </br>vous pouvez chercher « tarte aux pommes », « poisson », etc.</p>` ;
     }
 }
-
-
-
-
 /* SEARCH ingredients - couleur associée => Blue
     searchIngred a comme parametre l'ingrédient envoyé par listIngre au dessus;
     pour chaque ingredient on check si il est dans IngredTable si non on le push dedans;
     ensuite on trie par ordre alpha;
-
+*/
 
 // declaration des const utiles uniquement ici
 const formBlue = document.getElementById("formBlue");
@@ -141,7 +160,7 @@ function displayIngre(){
   }
  
 function listDesignBlue(a){
-    return `<li id="${a}List" onclick="filterTag( '${a}','blue')">${a} </li>` }  // on passe le nom et la couleur de fond en parametre
+    return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}');">${a} </li>` }  // on passe le nom et la couleur de fond en parametre
 
 function CloseIngre(){  // inverse de displayIngre
     formBlue.classList.remove('maxiform');
@@ -175,7 +194,7 @@ function displayApp(){
     }).join('')}` 
   }
 function listDesignGreen(a){
-    return `<li id="${a}List" onclick="filterTag( '${a}','green')">${a} </li>` }  
+    return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}')">${a} </li>` }  
 
 function CloseApp(){ 
     formGreen.classList.remove('maxiform');
@@ -196,26 +215,19 @@ function  CreateUstList(ust){
 }
 
 function searchUst(){  // fonction qui met tous les ustensiles dans 1 seul array UstTable
-    for(var i = 0; i < UstArray.length; i++) {
-        for(var j = 0; j < UstArray[i].length; j++) {
-            var lower= UstArray[i][j].toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+    UstArray.forEach(function(a){
+        a.forEach(function(b){
+            var lower= b.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             if(UstTable.includes(lower)==false){
                 UstTable.push(lower);
             }
-        }
-    }  
+        });
+    });  
     UstTable.sort();
 }
-// fonction pour utiliser la recherche top combinée au ustensils
-function displayUstTOP(app){
-    var a = app ;
-    var lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
-    if(UstTable.includes(lower)==false){
-        UstTable.push(lower);}
-    UstTable.sort();
-}
- 
+
 function displayUst(){
+    searchUst()
     formRed.classList.remove('miniform');
     formRed.classList.add('maxiform');
     btnDownRed.innerHTML = `<i class="fa-solid fa-angle-up"  onclick="CloseUst()"></i>`;
@@ -224,7 +236,7 @@ function displayUst(){
     }).join('')}` 
   }
   function listDesignRed(a){
- return `<li id="${a}List" onclick="filterTag( '${a}','red')">${a} </li>` }  
+ return `<li id="${a}List" onclick="filterTag( '${a}','red') ;addFilter('${a}')">${a} </li>` }  
 
 function CloseUst(){ 
    formRed.classList.remove('maxiform');
@@ -233,116 +245,26 @@ function CloseUst(){
    red.innerHTML = ``;
 } 
 
-// LISTENER top search bar
-
-
-var searchTop =document.getElementById("searchTop");
-var counter = 0;
-var directInput =""; // user input
-
-searchTop.addEventListener("keyup", function(event) {
-    
-    if (event.keyCode >= 65 && event.keyCode <= 90  ||event.keyCode ==50||event.keyCode ==55 ||event.keyCode ==48   ) { 
-        ++ counter; //  incrémente si on appuie sur une lettre uniquement é/è/à compris
-    }
-    if (event.keyCode == 8 && counter == 1){
-        displayRecipe(allRecipes) ; //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes
-        
-    }
-    if (event.keyCode == 8){
-        --counter// si backspace on décrémente  
-        if (counter < 0){ // si trop de backspace valeur min =0
-            counter = 0;
-        }
-    }
-       if (counter >= 3){
-         directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
-       // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
-        filterTop() // lance le filtre a chaque saisie de 3 ou + caracteres
-       }  
-})
-
-
-function filterTop(){
-    IngredTable=[];// on vide l'array des ingrédients pour afficher la recherche
-    AppTable=[]; 
-    UstTable=[];
-
-    main.innerHTML = `${allRecipes.map(function (recipeFilterTop){
-        return pageDesignFiltered(recipeFilterTop)
-    }).join('')}`
-
-    checkIfEmpty(); // verifie si on a un résultat
-}
-
-function pageDesignFiltered(r){ 
-    // explication nomenclature : reci pour recipe et Desc pour description
-    // Lower case pour faciliter la recherche  
-    var a =[]; 
-    var b=[]; 
-    var reciDesc = r.description.toLowerCase();
-    var reciName = r.name.toLowerCase();
-    // on map le resultat d'ingredients pour recuperer tout dans 1 array + lowercase + join
-    var reciIngre = r.ingredients;
-    var reciUst = r.ustensils;
-    
-    for(i=0; i<reciIngre.length; i++){
-        a.push(r.ingredients[i].ingredient)
-    } 
-    for(i=0; i<reciUst.length; i++){
-        b.push(reciUst[i])
-    } 
-    var reciIngre = a.map(e => e.toLocaleLowerCase()).join(' ');
-    // si la rechercher est inclue dans le nom les ingredients ou la description
-    if(reciName.includes(directInput) || reciIngre.includes(directInput) || reciDesc.includes(directInput) ){
-
-        // boucle qui permet de mettre a jour le filtre ingredient a la saisie
-        for(i=0; i<a.length ; i++){
-            searchIngred(a[i]);
-        }
-         // permet de mettre a jour le filtre Appareil a la saisie
-            searchApp(r.appliance);
-         // boucle qui permet de mettre a jour le filtre ingredient a la saisie
-         for(i=0; i<b.length ; i++){
-            displayUstTOP(b[i]);
-        }         
-    //searchApp(AppTable);
-    //CreateUstList(UstTable);
-    return `
-        <article>
-            <img src="/img/a.jpg" alt="placeholderimg">
-            <div class="titleArticle">
-                <h2>${r.name}</h2><span><i class="fa-regular fa-clock"></i> ${r.time} min</span>
-            </div>
-            <div class="basArticle">
-               <p class="ingredientsArticle">${ingredientsList(r.ingredients)}</p>
-               <p class="recetteArticle">${r.description}</p>
-            </div>
-        </article>
-    ` }
-   
-} 
 //// filter Tags
-
 
 function filterTag(tag, color){ 
     var tagList = document.getElementById(tag+'List');
     tagList.removeAttribute("onclick");
     tagList.classList.add("disabled");
-    document.getElementById("tags").innerHTML += `<span class="tagSelected ${color}" id="${tag}">${tag}<i class="fa-regular fa-circle-xmark" onclick="closeFilterTag('${tag}','${color}')"></i></span>`;
+    document.getElementById("tags").innerHTML += `<span class="tagSelected ${color}" id="${tag}">${tag}<i class="fa-regular fa-circle-xmark" onclick="closeFilterTag('${tag}','${color}'); removeFilter('${tag}')"></i></span>`;
 }
 function closeFilterTag(tag, color){
     var tagList = document.getElementById(tag+'List');
     document.getElementById(tag).remove();
-    tagList.classList.remove("disabled");
-    tagList.setAttribute('onclick','filterTag("'+tag+'","'+color+'")'); 
+    if(tagList != null){
+        tagList.classList.remove("disabled");
+        tagList.setAttribute('onclick','filterTag("'+tag+'","'+color+'")'); 
+    }
 }
 
-// CHeck si il y a des recettes:
-
-function checkIfEmpty(){
-    if (main.hasChildNodes()== false) {
-        document.getElementById("listRecipes").innerHTML = `<p id="error">Aucune recette ne correspond à votre critère... 
-        </br>vous pouvez chercher « tarte aux pommes », « poisson », etc.</p>` ;
-    }
-}*/
+function addFilter(id){
+    filterValue.push(id);
+}
+function removeFilter(id){
+    filterValue.pop(id);
+}
