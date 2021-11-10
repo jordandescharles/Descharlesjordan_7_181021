@@ -156,6 +156,7 @@ function display(formColor,btn,color){
 
     if(color == "blue"){ 
         IngredTable.sort();
+        console.log(IngredTable)
         document.getElementById(color).innerHTML = `${IngredTable.map(function (listIngredients){
             return listDesign(listIngredients,color) }).join('')}` 
     }
@@ -222,15 +223,21 @@ function tagCheck(a){
 
         // permet de mettre tous les ingredients ustensiles et appareils de la recette en un array pour comparer
         ingredients.forEach(e => { 
-            e = e.ingredient.toLowerCase();
+            e = e.ingredient.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             filterlistRecipe.push(e)}
         );
-        ustensils.forEach(e => { filterlistRecipe.push(e.toLowerCase())});
-        filterlistRecipe.push(appliance.toLowerCase());
-       
+        ustensils.forEach(e => { 
+            e = e.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+            filterlistRecipe.push(e)}
+            );
+        
+        filterlistRecipe.push(appliance.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i'));
+        
+ 
         if (valueChecker(filterlistRecipe,filterValue) && tagRecipe.includes(recipe) === false) {
             tagRecipe.push(recipe)} 
     }); 
+    
     displayRecipe(tagRecipe);
     checkIfEmpty()
 } 
@@ -272,7 +279,7 @@ function listernerFiltre (source,table,formColor,btn,color) {
         if (counterFilter >= 0){  
             inputFilter = source.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             threeLetterFilter(table,formColor,btn,color)   
-        } console.log(counterFilter);
+        } 
     }) 
    
 }
@@ -284,7 +291,9 @@ function threeLetterFilter(table,formColor,btn,color){
         };
     });
     if (color == "blue"){ IngredTable = tampon;};
-    if (color == "green"){ AppTable = tampon; };
+    if (color == "green"){ AppTable = tampon;};
     if (color == "red"){ UstTable = tampon; };
-    display(formColor,btn,color)   ;
+    
+    display(formColor,btn,color);
+    console.log(AppTable )  
 }
