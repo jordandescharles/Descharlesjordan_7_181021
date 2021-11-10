@@ -9,8 +9,9 @@ var filterValue= [];
 var all = []; ;
 var searchTop =document.getElementById("searchTop");
 var counter = 0;
+var counterFilter = 0;
 var directInput =""; 
-
+var inputFilter ="";
 const main = document.getElementById("listRecipes");
 const formBlue = "formBlue";
 const btnDownBlue = "buttonDownBlue";
@@ -22,8 +23,6 @@ const formRed = "formRed";
 const btnDownRed = "buttonDownRed";
 const red = "red";
 
-    //////// recupération du JSON
-
 fetch('recipes.json')
     .then((response) => {
         return response.json();
@@ -32,18 +31,12 @@ fetch('recipes.json')
         allRecipes = data.recipes;
         displayRecipe(allRecipes) ;
 });
-
     ////////  affichage Principal des plats avec Littéraux de gabarits 
-
 function displayRecipe(recipes){ 
-
     main.innerHTML =``; // vide l'affichage précédent
-
     recipes.forEach(function(recipe){
-        
         search(recipe.appliance,"appliance");
         CreateUstList(recipe.ustensils)
-        
         main.innerHTML += `
         <article>
             <img src="/img/a.jpg" alt="placeholderimg">
@@ -55,9 +48,7 @@ function displayRecipe(recipes){
             <p class="recetteArticle">${recipe.description}</p>
             </div>
         </article>`    
-          
         // permet de verifier si les ingrédients ont une quantité et une unité puis les affiches
-
         var a = recipe.ingredients;
         a.forEach(function(ingre){
             if (ingre.hasOwnProperty("quantity") && ingre.hasOwnProperty("unit")){
@@ -75,19 +66,14 @@ function displayRecipe(recipes){
         });
     });
 } 
-
-    //////// Fonction d'ecoute de la saisie
-
+    //////// Fonction d'ecoute de la saisie de la recherche principale
 searchTop.addEventListener("keyup", function(event) {
-    
     if (event.keyCode >= 65 && event.keyCode <= 90  || event.keyCode ==50 || event.keyCode ==55 || event.keyCode==48){ 
         ++ counter; } 
-
     if (event.keyCode == 8 && counter <= 3){
         allRecipesFiltered=[];
         main.innerHTML = ``;
         displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes   
-
     if (event.keyCode == 8){
         --counter// si backspace on décrémente 
         searchValue= ""; 
@@ -102,48 +88,40 @@ searchTop.addEventListener("keyup", function(event) {
         filterTop(directInput);
     }  
 })
-
  // Fonction de filtre suite a la saisie
-
 function filterTop(a){
     allRecipes.forEach(recette => {
         var name= recette.name.toLowerCase();
         var desc= recette.description.toLowerCase();
         var ingredients= recette.ingredients;
-
         // si le nom ou la description incluent la recherche
         if(name.includes(a) || desc.includes(a)){
             if(allRecipesFiltered.includes(recette) == false){
                 allRecipesFiltered.push(recette);
-                }
-            }       
+            }
+        }       
         ingredients.forEach(ingred =>{   
             var ingredient = ingred.ingredient  
             // si les ingrédients inclus la recherche      
             if(ingredient.includes(a)){
                 if(allRecipesFiltered.includes(recette) == false){
                     allRecipesFiltered.push(recette);
-                    }
+                }
             } 
         });
     });
-
     main.innerHTML = ``;
     displayRecipe(allRecipesFiltered);
     checkIfEmpty(); 
 } 
-
     //////// verifie si main et vide => affiche un message d erreur
-
 function checkIfEmpty(){
     if (main.hasChildNodes()== false) {
         document.getElementById("listRecipes").innerHTML = `<p id="error">Aucune recette ne correspond à votre critère... 
         </br>vous pouvez chercher « tarte aux pommes », « poisson », etc.</p>` ;
     }
 }
-
     //////// fonction qui cherche tous les tags ingredient ou appareils pour les mettre en array
-
 function search(a,source){
     var lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
     if(source == "ingredient"){
@@ -155,13 +133,11 @@ function search(a,source){
             AppTable.push(lower);
     }}  
 }
-
     // fonction qui cherche tous les tags ustensiles pour les mettre en array
-
 function  CreateUstList(ust){
     UstArray.push(ust) // recup un Ustarray rempli avec des tableaux d'ustensiles
+    searchUst();
 }
-
 function searchUst(){  // 2 boucles pour chercher les valeurs dans les arrays
     UstArray.forEach(function(a){
         a.forEach(function(b){
@@ -172,9 +148,7 @@ function searchUst(){  // 2 boucles pour chercher les valeurs dans les arrays
          });
      });    
  }
-
     //////// fonction qui map les tag de chaque catégories au clic sur la fleche vers le bas
-
 function display(formColor,btn,color){
     document.getElementById(formColor).classList.remove('miniform');
     document.getElementById(formColor).classList.add('maxiform'); // permet d'afficher
@@ -191,32 +165,25 @@ function display(formColor,btn,color){
             return listDesign(listApp ,color);}).join('')}` 
     }
     if(color == "red"){ 
-        searchUst();
         UstTable.sort();
         document.getElementById(color).innerHTML = `${UstTable.map(function (listUst){
             return listDesign(listUst,color)}).join('')}` 
     }
 }
-
     // fonction qui liste les tags avec les bon parametres
-
 function listDesign(a,color){
     if(color == "blue"){ return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}')">${a} </li>`}  
     if(color == "green"){return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}')">${a} </li>` }  
     if(color == "red"){  return `<li id="${a}List" onclick="filterTag( '${a}','red');addFilter('${a}')">${a} </li>`  }  
 }
-
     // fonction qui ferme les listes de tags
-
 function closeTagList(formColor,btn,color){ 
     document.getElementById(formColor).classList.remove('maxiform');
     document.getElementById(formColor).classList.add('miniform');
     document.getElementById(btn).innerHTML = `<i class="fa-solid fa-angle-down"  onclick="display('${formColor}','${btn}','${color}')"></i>`;
     document.getElementById(color).innerHTML = ``;
 } 
-
     //////// filter Tags
-
 function filterTag(tag, color){ 
     var tagList = document.getElementById(tag+'List');
     tagList.removeAttribute("onclick");
@@ -231,35 +198,22 @@ function closeFilterTag(tag, color){
         tagList.setAttribute('onclick','filterTag("'+tag+'","'+color+'")'); 
     }
 }
-
-// fonctions qui ajoutent ou retire un tag du tableau de filtre
+    // fonctions qui ajoutent ou retire un tag du tableau de filtre
 function addFilter(id){
     filterValue.push(id);
-    if(counter>=3){
-        tagCheck(allRecipesFiltered) 
-    }
-    else if(counter<3){
-        tagCheck(allRecipes) 
-    }
+    if(counter>=3){ tagCheck(allRecipesFiltered) }
+    else if(counter<3){ tagCheck(allRecipes) }
 }
 function removeFilter(id){
     filterValue.pop(id);
-    if(counter>=3){
-        tagCheck(allRecipesFiltered) 
-    }
-    else if(counter<3){
-        tagCheck(allRecipes) 
-    }
+    if(counter>=3){ tagCheck(allRecipesFiltered) }
+    else if(counter<3){ tagCheck(allRecipes) }
 }
-
-//////// verifie si un tag est selectionné
-
+    //////// verifie si un tag est selectionné
 function tagCheck(a){
     var tagRecipe =[];
-
     // fonction qui compare les arrays
     let valueChecker = (array,tags) => tags.every(e => array.includes(e)); 
-
     a.forEach(recipe => { 
         var filterlistRecipe=[] ;
         var ingredients = recipe.ingredients;
@@ -277,12 +231,60 @@ function tagCheck(a){
         if (valueChecker(filterlistRecipe,filterValue) && tagRecipe.includes(recipe) === false) {
             tagRecipe.push(recipe)} 
     }); 
-
     displayRecipe(tagRecipe);
     checkIfEmpty()
 } 
-   
 
- 
- 
- 
+function checkfiltreColor(color){
+    var a;
+    if(color = "blue" ){ 
+        a = document.getElementById("searchBlue");
+        b = IngredTable;
+        listernerFiltre (a,b,formBlue,btnDownBlue,blue);
+    }
+    if(color = "green" ){ 
+        a = document.getElementById("searchGreen");
+        b = AppTable;
+        listernerFiltre (a,b,formGreen,btnDownGreen,green);
+    }
+    if(color = "red" ){   
+        a = document.getElementById("searchRed");
+        b = UstTable;
+        listernerFiltre (a,b,formRed,btnDownRed,red);
+    }  
+}
+
+//////// Fonction d'ecoute de la saisie de la recherche principale
+function listernerFiltre (source,table,formColor,btn,color) {
+    source.addEventListener("keyup", function(event) {
+       
+        if (event.keyCode >= 65 && event.keyCode <= 90  || event.keyCode ==50 || event.keyCode ==55 || event.keyCode==48 ){ 
+            ++ counterFilter; 
+        }  
+        if (event.keyCode == 8){
+            -- counterFilter ; 
+            threeLetterFilter(table,formColor,btn,color) ;    
+        }
+         if (counterFilter <= 0)  {
+                counterFilter = 0;
+                inputFilter ='';
+            }
+        if (counterFilter >= 0){  
+            inputFilter = source.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+            threeLetterFilter(table,formColor,btn,color)   
+        } console.log(counterFilter);
+    }) 
+   
+}
+function threeLetterFilter(table,formColor,btn,color){
+    var tampon = [];
+    table.forEach(e => {
+        if(e.includes(inputFilter)){
+            tampon.push(e);
+        };
+    });
+    if (color == "blue"){ IngredTable = tampon;};
+    if (color == "green"){ AppTable = tampon; };
+    if (color == "red"){ UstTable = tampon; };
+    display(formColor,btn,color)   ;
+}
