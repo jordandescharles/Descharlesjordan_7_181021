@@ -7,10 +7,23 @@ var UstArray = [];
 var searchValue;
 var filterValue= [];
 var all = []; ;
+var searchTop =document.getElementById("searchTop");
+var counter = 0;
+var directInput =""; 
 
 const main = document.getElementById("listRecipes");
+const formBlue = "formBlue";
+const btnDownBlue = "buttonDownBlue";
+const blue = "blue";
+const formGreen = "formGreen";
+const btnDownGreen = "buttonDownGreen";
+const green = "green";
+const formRed = "formRed";
+const btnDownRed = "buttonDownRed";
+const red = "red";
 
-// recupération du JSON
+    //////// recupération du JSON
+
 fetch('recipes.json')
     .then((response) => {
         return response.json();
@@ -20,17 +33,17 @@ fetch('recipes.json')
         displayRecipe(allRecipes) ;
 });
 
-/* affichage Principaldes plats avec Littéraux de gabarits 
-    displayRecipe --  MAP pour afficher les elements de pageDesign
-        pageDesign -- renvoie la mise en page d'un element "article"
-        ingredientsList -- sert a affficher les ingrédients
-        listIngre -- envoie la mise en page de chaque ingrédient a ingredientsList
-*/
+    ////////  affichage Principal des plats avec Littéraux de gabarits 
+
 function displayRecipe(recipes){ 
+
+    main.innerHTML =``; // vide l'affichage précédent
+
     recipes.forEach(function(recipe){
-        var a =recipe.ingredients;
-        searchApp(recipe.appliance);
+        
+        search(recipe.appliance,"appliance");
         CreateUstList(recipe.ustensils)
+        
         main.innerHTML += `
         <article>
             <img src="/img/a.jpg" alt="placeholderimg">
@@ -41,58 +54,56 @@ function displayRecipe(recipes){
             <p class="ingredientsArticle" id="${recipe.id}"></p>
             <p class="recetteArticle">${recipe.description}</p>
             </div>
-        </article>
-    ` 
+        </article>`    
+          
+        // permet de verifier si les ingrédients ont une quantité et une unité puis les affiches
+
+        var a = recipe.ingredients;
         a.forEach(function(ingre){
             if (ingre.hasOwnProperty("quantity") && ingre.hasOwnProperty("unit")){
                 document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity} ${ingre.unit}</br> `;
-                searchIngred (ingre.ingredient);
+                search (ingre.ingredient,"ingredient"); //envoie l'ingrédient dans la liste de
             }
             else if (ingre.hasOwnProperty("unit") == false && ingre.hasOwnProperty("quantity")){
                 document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity}  </br> `
-                searchIngred (ingre.ingredient);;
+                search (ingre.ingredient,"ingredient");
             }
             else if (ingre.hasOwnProperty("quantity") == false && ingre.hasOwnProperty("unit") == false){
                 document.getElementById(recipe.id).innerHTML += `<strong>${ingre.ingredient}</strong>  </br> `;
-                searchIngred (ingre.ingredient);
+                search (ingre.ingredient,"ingredient");
             }
         });
     });
 } 
 
-// LISTENER top search bar
-
-var searchTop =document.getElementById("searchTop");
-var counter = 0;
-var directInput =""; // user input
+    //////// Fonction d'ecoute de la saisie
 
 searchTop.addEventListener("keyup", function(event) {
     
-    if (event.keyCode >= 65 && event.keyCode <= 90  ||event.keyCode ==50||event.keyCode ==55 ||event.keyCode ==48   ) { 
-        ++ counter; } //incrémente si on appuie sur une lettre uniquement é/è/à compris
-    if (event.keyCode == 8 &&  counter <= 3){
+    if (event.keyCode >= 65 && event.keyCode <= 90  || event.keyCode ==50 || event.keyCode ==55 || event.keyCode==48){ 
+        ++ counter; } 
+
+    if (event.keyCode == 8 && counter <= 3){
         allRecipesFiltered=[];
         main.innerHTML = ``;
-        displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes    
+        displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes   
+
     if (event.keyCode == 8){
         --counter// si backspace on décrémente 
-        searchValue=""; 
-        if (counter < 0){ 
-            counter = 0;
-        } // empeche de passer counter en negatif 
+        searchValue= ""; 
+        if (counter < 0){ counter = 0;} // empeche de passer counter en negatif 
     }
     if (counter >= 3){  // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
         directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
         searchValue=directInput;
-        IngredTable=[];
-        AppTable=[];
-        UstArray=[];
-        UstTable=[];
+        /* on vide les arrays car ils ne correspondent plus à la recherche
+            ils seront remplis au display des recetes filtrées */
+        IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];
         filterTop(directInput);
     }  
 })
 
-
+ // Fonction de filtre suite a la saisie
 
 function filterTop(a){
     allRecipes.forEach(recette => {
@@ -100,29 +111,29 @@ function filterTop(a){
         var desc= recette.description.toLowerCase();
         var ingredients= recette.ingredients;
 
+        // si le nom ou la description incluent la recherche
         if(name.includes(a) || desc.includes(a)){
             if(allRecipesFiltered.includes(recette) == false){
                 allRecipesFiltered.push(recette);
                 }
             }       
         ingredients.forEach(ingred =>{   
-            var ingredient = ingred.ingredient        
+            var ingredient = ingred.ingredient  
+            // si les ingrédients inclus la recherche      
             if(ingredient.includes(a)){
                 if(allRecipesFiltered.includes(recette) == false){
                     allRecipesFiltered.push(recette);
                     }
             } 
-        
         });
     });
+
     main.innerHTML = ``;
     displayRecipe(allRecipesFiltered);
-    checkIfEmpty();
-    console.log(test)
-
+    checkIfEmpty(); 
 } 
 
-
+    //////// verifie si main et vide => affiche un message d erreur
 
 function checkIfEmpty(){
     if (main.hasChildNodes()== false) {
@@ -130,122 +141,81 @@ function checkIfEmpty(){
         </br>vous pouvez chercher « tarte aux pommes », « poisson », etc.</p>` ;
     }
 }
-/* SEARCH ingredients - couleur associée => Blue
-    searchIngred a comme parametre l'ingrédient envoyé par listIngre au dessus;
-    pour chaque ingredient on check si il est dans IngredTable si non on le push dedans;
-    ensuite on trie par ordre alpha;
-*/
 
-// declaration des const utiles uniquement ici
-const formBlue = document.getElementById("formBlue");
-const btnDown = document.getElementById("buttonDown");
-const blue = document.getElementById("blue");
+    //////// fonction qui cherche tous les tags ingredient ou appareils pour les mettre en array
 
-function searchIngred (ingred){
-    var a =ingred;
+function search(a,source){
     var lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
-    if(IngredTable.includes(lower)==false){
-        IngredTable.push(lower);
-    }
-    IngredTable.sort();
+    if(source == "ingredient"){
+        if(IngredTable.includes(lower)==false){
+            IngredTable.push(lower);
+    }}
+    if(source == "appliance"){
+        if(AppTable.includes(lower)==false){
+            AppTable.push(lower);
+    }}  
 }
 
-function displayIngre(){
-    formBlue.classList.remove('miniform'); // remove la classe pour l'affichage du champs de recherche bleu
-    formBlue.classList.add('maxiform'); // ajoute la classe pour l'affichage correct de la liste
-    btnDown.innerHTML = `<i class="fa-solid fa-angle-up"  onclick="CloseIngre()"></i>`;// remplacement de la fleche pour fermer la liste
-    blue.innerHTML = `${IngredTable.map(function (listIngredients){
-        return listDesignBlue(listIngredients) // Map tous les liens de la liste d'ingrédients
-    }).join('')}`     
-  }
- 
-function listDesignBlue(a){
-    return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}');">${a} </li>` }  // on passe le nom et la couleur de fond en parametre
-
-function CloseIngre(){  // inverse de displayIngre
-    formBlue.classList.remove('maxiform');
-    formBlue.classList.add('miniform');
-    btnDown.innerHTML = `<i class="fa-solid fa-angle-down"  onclick="displayIngre()"></i>`;// on remet le lien comme il été en etat initial
-    blue.innerHTML = ``;
-} 
-
-
-// SEARCH Appareil - couleur associée => Green  
-//idem blue
-
-const formGreen = document.getElementById("formGreen");
-const btnDownGreen = document.getElementById("buttonDownGreen");
-const green = document.getElementById("green");
-
-function searchApp(app){
-    var a = app ;
-    var lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
-    if(AppTable.includes(lower)==false){
-        AppTable.push(lower);}
-    AppTable.sort();
-}
-
-function displayApp(){
-    formGreen.classList.remove('miniform');
-    formGreen.classList.add('maxiform');
-    btnDownGreen.innerHTML = `<i class="fa-solid fa-angle-up"  onclick="CloseApp()"></i>`;
-    green.innerHTML = `${AppTable.map(function(listApp){
-        return listDesignGreen(listApp);
-    }).join('')}` 
-  }
-function listDesignGreen(a){
-    return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}')">${a} </li>` }  
-
-function CloseApp(){ 
-    formGreen.classList.remove('maxiform');
-    formGreen.classList.add('miniform');
-    btnDownGreen.innerHTML = `<i class="fa-solid fa-angle-down"  onclick="displayApp()"></i>`;
-    green.innerHTML = ``;
-} 
-
-// SEARCH Ustensiles couleur associée => Red
-//idem blue
-
-const formRed = document.getElementById("formRed");
-const btnDownRed = document.getElementById("buttonDownRed");
-const red = document.getElementById("red");
+    // fonction qui cherche tous les tags ustensiles pour les mettre en array
 
 function  CreateUstList(ust){
-   UstArray.push(ust) // recup un array avec tous les arrays
+    UstArray.push(ust) // recup un Ustarray rempli avec des tableaux d'ustensiles
 }
 
-function searchUst(){  // fonction qui met tous les ustensiles dans 1 seul array UstTable
+function searchUst(){  // 2 boucles pour chercher les valeurs dans les arrays
     UstArray.forEach(function(a){
         a.forEach(function(b){
             var lower= b.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             if(UstTable.includes(lower)==false){
-                UstTable.push(lower);
-            }
-        });
-    });  
-    UstTable.sort();
+                 UstTable.push(lower);
+             }
+         });
+     });    
+ }
+
+    //////// fonction qui map les tag de chaque catégories au clic sur la fleche vers le bas
+
+function display(formColor,btn,color){
+    document.getElementById(formColor).classList.remove('miniform');
+    document.getElementById(formColor).classList.add('maxiform'); // permet d'afficher
+    document.getElementById(btn).innerHTML = `<i class="fa-solid fa-angle-up"  onclick="closeTagList('${formColor}','${btn}','${color}')"></i>`;
+
+    if(color == "blue"){ 
+        IngredTable.sort();
+        document.getElementById(color).innerHTML = `${IngredTable.map(function (listIngredients){
+            return listDesign(listIngredients,color) }).join('')}` 
+    }
+    if(color == "green"){
+        AppTable.sort();
+        document.getElementById(color).innerHTML = `${AppTable.map(function(listApp){
+            return listDesign(listApp ,color);}).join('')}` 
+    }
+    if(color == "red"){ 
+        searchUst();
+        UstTable.sort();
+        document.getElementById(color).innerHTML = `${UstTable.map(function (listUst){
+            return listDesign(listUst,color)}).join('')}` 
+    }
 }
 
-function displayUst(){
-    searchUst()
-    formRed.classList.remove('miniform');
-    formRed.classList.add('maxiform');
-    btnDownRed.innerHTML = `<i class="fa-solid fa-angle-up"  onclick="CloseUst()"></i>`;
-    red.innerHTML = `${UstTable.map(function (listUst){
-        return listDesignRed(listUst)
-    }).join('')}` 
-  }
-  function listDesignRed(a){
- return `<li id="${a}List" onclick="filterTag( '${a}','red') ;addFilter('${a}')">${a} </li>` }  
+    // fonction qui liste les tags avec les bon parametres
 
-function CloseUst(){ 
-   formRed.classList.remove('maxiform');
-   formRed.classList.add('miniform');
-   btnDownRed.innerHTML = `<i class="fa-solid fa-angle-down"  onclick="displayUst()"></i>`;
-   red.innerHTML = ``;
+function listDesign(a,color){
+    if(color == "blue"){ return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}')">${a} </li>`}  
+    if(color == "green"){return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}')">${a} </li>` }  
+    if(color == "red"){  return `<li id="${a}List" onclick="filterTag( '${a}','red');addFilter('${a}')">${a} </li>`  }  
+}
+
+    // fonction qui ferme les listes de tags
+
+function closeTagList(formColor,btn,color){ 
+    document.getElementById(formColor).classList.remove('maxiform');
+    document.getElementById(formColor).classList.add('miniform');
+    document.getElementById(btn).innerHTML = `<i class="fa-solid fa-angle-down"  onclick="display('${formColor}','${btn}','${color}')"></i>`;
+    document.getElementById(color).innerHTML = ``;
 } 
 
-//// filter Tags
+    //////// filter Tags
 
 function filterTag(tag, color){ 
     var tagList = document.getElementById(tag+'List');
@@ -262,9 +232,57 @@ function closeFilterTag(tag, color){
     }
 }
 
+// fonctions qui ajoutent ou retire un tag du tableau de filtre
 function addFilter(id){
     filterValue.push(id);
+    if(counter>=3){
+        tagCheck(allRecipesFiltered) 
+    }
+    else if(counter<3){
+        tagCheck(allRecipes) 
+    }
 }
 function removeFilter(id){
     filterValue.pop(id);
+    if(counter>=3){
+        tagCheck(allRecipesFiltered) 
+    }
+    else if(counter<3){
+        tagCheck(allRecipes) 
+    }
 }
+
+//////// verifie si un tag est selectionné
+
+function tagCheck(a){
+    var tagRecipe =[];
+
+    // fonction qui compare les arrays
+    let valueChecker = (array,tags) => tags.every(e => array.includes(e)); 
+
+    a.forEach(recipe => { 
+        var filterlistRecipe=[] ;
+        var ingredients = recipe.ingredients;
+        var appliance = recipe.appliance;
+        var ustensils= recipe.ustensils;
+
+        // permet de mettre tous les ingredients ustensiles et appareils de la recette en un array pour comparer
+        ingredients.forEach(e => { 
+            e = e.ingredient.toLowerCase();
+            filterlistRecipe.push(e)}
+        );
+        ustensils.forEach(e => { filterlistRecipe.push(e.toLowerCase())});
+        filterlistRecipe.push(appliance.toLowerCase());
+       
+        if (valueChecker(filterlistRecipe,filterValue) && tagRecipe.includes(recipe) === false) {
+            tagRecipe.push(recipe)} 
+    }); 
+
+    displayRecipe(tagRecipe);
+    checkIfEmpty()
+} 
+   
+
+ 
+ 
+ 
