@@ -13,17 +13,17 @@
     <img src="/img/logo.png" alt="logo site">
     <h1>Les petits plats</h1> 
     <form class="form" role="search">
-        <input type="search" id="searchTop" name="research" placeholder="Rechercher un ingrédient, appareil, ustensiles ou une recette"aria-label="barre de recherche">
+        <input type="search" id="searchTop" name="research" placeholder="Rechercher un ingrédient, appareil, ustensiles ou une recette" aria-label="barre de recherche">
         <button><i class="fa-solid fa-magnifying-glass"></i></button>
       </form>
 </header>
 <div id="tags">
 </div>
-<menu>
+<div id='menu'>
     <div id="formBlue" class="miniform blue">
     <form role="search">
         <input type="search" id="searchBlue" name="ingedients" placeholder="Ingrédient" aria-label="barre de recherche ingrédient" onclick="checkfiltreColor('blue')">
-        <span id="buttonDownBlue"><i class="fa-solid fa-angle-down" onclick="display(formBlue,btnDownBlue,blue)"></i></span> </br>
+        <span id="buttonDownBlue"><i class="fa-solid fa-angle-down" onclick="display(formBlue,btnDownBlue,blue)"></i></span> <br>
         </form>
    <div class="list blue">
  <ul id="blue"></ul>
@@ -32,7 +32,7 @@
     <div id="formGreen" class="miniform green">
     <form role="search">
         <input type="search" id="searchGreen" name="ingedients" placeholder="Appareil" aria-label="barre de recherche ingrédient" onclick="checkfiltreColor('green')">
-        <span id="buttonDownGreen"><i class="fa-solid fa-angle-down" onclick="display(formGreen,btnDownGreen,green)"></i></span></br>
+        <span id="buttonDownGreen"><i class="fa-solid fa-angle-down" onclick="display(formGreen,btnDownGreen,green)"></i></span><br>
     </form>
     <div class="list green">
         <ul id="green"></ul> </div>
@@ -40,15 +40,16 @@
     <div id="formRed" class="miniform red" >
     <form role="search">
         <input type="search" id="searchRed" name="ingedients" placeholder="Ustensiles" aria-label="barre de recherche ingrédient" onclick="checkfiltreColor('red')">
-        <span id="buttonDownRed"><i class="fa-solid fa-angle-down" onclick="display(formRed,btnDownRed,red)"></i></span></br>
+        <span id="buttonDownRed"><i class="fa-solid fa-angle-down" onclick="display(formRed,btnDownRed,red)"></i></span><br>
     </form>
     <div class="list red">
         <ul id="red"></ul> </div>
 </div>
 
-</menu>
+</div>
 <main id="listRecipes"></main>
 
+<script src="script.js"></script>
+</body>
 
-</body><script src="script.js"></script>
 </html>

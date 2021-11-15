@@ -12,6 +12,7 @@ var counter = 0;
 var counterFilter = 0;
 var directInput =""; 
 var inputFilter ="";
+var tagRecipe =[];
 const main = document.getElementById("listRecipes");
 const formBlue = "formBlue";
 const btnDownBlue = "buttonDownBlue";
@@ -33,6 +34,7 @@ fetch('recipes.json')
 });
     ////////  affichage Principal des plats avec Littéraux de gabarits 
 function displayRecipe(recipes){ 
+    IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];
     main.innerHTML =``; // vide l'affichage précédent
     recipes.forEach(function(recipe){
         search(recipe.appliance,"appliance");
@@ -76,7 +78,7 @@ searchTop.addEventListener("keyup", function(event) {
         displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes   
     if (event.keyCode == 8){
         --counter// si backspace on décrémente 
-        searchValue= ""; 
+         
         if (counter < 0){ counter = 0;} // empeche de passer counter en negatif 
     }
     if (counter >= 3){  // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
@@ -84,31 +86,34 @@ searchTop.addEventListener("keyup", function(event) {
         searchValue=directInput;
         /* on vide les arrays car ils ne correspondent plus à la recherche
             ils seront remplis au display des recetes filtrées */
-        IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];
+        IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];allRecipesFiltered=[];
         filterTop(directInput);
     }  
 })
  // Fonction de filtre suite a la saisie
 function filterTop(a){
     allRecipes.forEach(recette => {
+        var ingredInclude = false;
+        var nameDescInclude = false;
         var name= recette.name.toLowerCase();
         var desc= recette.description.toLowerCase();
         var ingredients= recette.ingredients;
         // si le nom ou la description incluent la recherche
         if(name.includes(a) || desc.includes(a)){
-            if(allRecipesFiltered.includes(recette) == false){
-                allRecipesFiltered.push(recette);
-            }
+                nameDescInclude = true;
         }       
         ingredients.forEach(ingred =>{   
             var ingredient = ingred.ingredient  
             // si les ingrédients inclus la recherche      
             if(ingredient.includes(a)){
-                if(allRecipesFiltered.includes(recette) == false){
-                    allRecipesFiltered.push(recette);
-                }
+                ingredInclude = true ;
             } 
         });
+        if (nameDescInclude == true || ingredInclude == true){
+            if(allRecipesFiltered.includes(recette) == false){
+                 allRecipesFiltered.push(recette);
+            }
+        }        
     });
     main.innerHTML = ``;
     displayRecipe(allRecipesFiltered);
@@ -156,7 +161,6 @@ function display(formColor,btn,color){
 
     if(color == "blue"){ 
         IngredTable.sort();
-        console.log(IngredTable)
         document.getElementById(color).innerHTML = `${IngredTable.map(function (listIngredients){
             return listDesign(listIngredients,color) }).join('')}` 
     }
@@ -173,9 +177,9 @@ function display(formColor,btn,color){
 }
     // fonction qui liste les tags avec les bon parametres
 function listDesign(a,color){
-    if(color == "blue"){ return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}')">${a} </li>`}  
-    if(color == "green"){return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}')">${a} </li>` }  
-    if(color == "red"){  return `<li id="${a}List" onclick="filterTag( '${a}','red');addFilter('${a}')">${a} </li>`  }  
+    if(color == "blue"){ return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}') ; closeTagList('formBlue','buttonDownBlue','blue'); cleanTagInput('blue')">${a} </li>`}  
+    if(color == "green"){return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}') ; closeTagList('formGreen','buttonDownGreen','green');cleanTagInput('green')">${a} </li>` }  
+    if(color == "red"){  return `<li id="${a}List" onclick="filterTag( '${a}','red');addFilter('${a}');closeTagList('formRed','buttonDownRed','red');cleanTagInput('red')">${a} </li>`  }  
 }
     // fonction qui ferme les listes de tags
 function closeTagList(formColor,btn,color){ 
@@ -209,18 +213,18 @@ function removeFilter(id){
     filterValue.pop(id);
     if(counter>=3){ tagCheck(allRecipesFiltered) }
     else if(counter<3){ tagCheck(allRecipes) }
+    
 }
     //////// verifie si un tag est selectionné
 function tagCheck(a){
-    var tagRecipe =[];
     // fonction qui compare les arrays
+    tagRecipe=[];
     let valueChecker = (array,tags) => tags.every(e => array.includes(e)); 
     a.forEach(recipe => { 
         var filterlistRecipe=[] ;
         var ingredients = recipe.ingredients;
         var appliance = recipe.appliance;
         var ustensils= recipe.ustensils;
-
         // permet de mettre tous les ingredients ustensiles et appareils de la recette en un array pour comparer
         ingredients.forEach(e => { 
             e = e.ingredient.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
@@ -229,19 +233,14 @@ function tagCheck(a){
         ustensils.forEach(e => { 
             e = e.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             filterlistRecipe.push(e)}
-            );
-        
+            );    
         filterlistRecipe.push(appliance.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i'));
-        
- 
-        if (valueChecker(filterlistRecipe,filterValue) && tagRecipe.includes(recipe) === false) {
+        if (valueChecker(filterlistRecipe,filterValue)) {
             tagRecipe.push(recipe)} 
     }); 
-    
     displayRecipe(tagRecipe);
     checkIfEmpty()
 } 
-
 function checkfiltreColor(color){
     var a;
     if(color = "blue" ){ 
@@ -260,7 +259,6 @@ function checkfiltreColor(color){
         listernerFiltre (a,b,formRed,btnDownRed,red);
     }  
 }
-
 //////// Fonction d'ecoute de la saisie de la recherche principale
 function listernerFiltre (source,table,formColor,btn,color) {
     source.addEventListener("keyup", function(event) {
@@ -281,7 +279,6 @@ function listernerFiltre (source,table,formColor,btn,color) {
             threeLetterFilter(table,formColor,btn,color)   
         } 
     }) 
-   
 }
 function threeLetterFilter(table,formColor,btn,color){
     var tampon = [];
@@ -293,7 +290,17 @@ function threeLetterFilter(table,formColor,btn,color){
     if (color == "blue"){ IngredTable = tampon;};
     if (color == "green"){ AppTable = tampon;};
     if (color == "red"){ UstTable = tampon; };
-    
     display(formColor,btn,color);
-    console.log(AppTable )  
+}
+/////// fontcion qui nettoie la saisie des tag apres le clic
+function cleanTagInput(color){
+    if(color = "blue" ){ 
+        document.getElementById("searchBlue").value = "";
+    }
+    if(color = "green" ){ 
+        a = document.getElementById("searchGreen").value = "";
+    }
+    if(color = "red" ){   
+        a = document.getElementById("searchRed").value = "";
+    }  
 }

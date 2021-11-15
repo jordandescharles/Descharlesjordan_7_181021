@@ -50,7 +50,7 @@ header form {
   }
 
   /* Fin du style du HEAD */
-  menu{
+  #menu{
     margin-top: 2%;
     margin-left: auto;
     margin-right: auto;
@@ -61,7 +61,7 @@ header form {
     position: relative;
 }
 
-menu form {
+#menu form {
     height: 60px;
     border-radius: 5px;
     display: flex;
@@ -70,7 +70,7 @@ menu form {
     align-items: center;
     width: 100%;
   }
- menu input {
+  #menu input {
     all: unset;
     font: 16px;
     color: #ffffff;
@@ -79,7 +79,7 @@ menu form {
     padding: 0px 10px;
     text-align: left;
   }
-menu span {
+  #menu span {
     all: unset;
     text-align: center;
     cursor: pointer;
@@ -87,7 +87,7 @@ menu span {
     height: 44px;
     line-height: 50px;
   }
-menu span i{
+  #menu span i{
     color : #ffffff;
     font-size:22px;
   }
@@ -100,6 +100,7 @@ div ul{
     overflow:inherit;
     width: auto;
    margin-bottom: 20px;
+   margin-top: 0;
 }
 
 div ul li{
