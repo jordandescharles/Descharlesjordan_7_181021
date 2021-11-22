@@ -41,7 +41,7 @@ function displayRecipe(recipes){
         CreateUstList(recipe.ustensils)
         main.innerHTML += `
         <article>
-            <img src="/img/a.jpg" alt="placeholderimg">
+            <img src="/img/grey.jpg" alt="placeholderimg">
             <div class="titleArticle">
                 <h2>${recipe.name}</h2><span><i class="fa-regular fa-clock"></i> ${recipe.time} min</span>
             </div>
@@ -66,33 +66,48 @@ function displayRecipe(recipes){
                 search (ingre.ingredient,"ingredient");
             }
         });
-    });
+    }); 
 } 
     //////// Fonction d'ecoute de la saisie de la recherche principale
 searchTop.addEventListener("keyup", function(event) {
     if (event.keyCode >= 65 && event.keyCode <= 90  || event.keyCode ==50 || event.keyCode ==55 || event.keyCode==48){ 
         ++ counter; } 
+
     if (event.keyCode == 8 && counter <= 3){
-        allRecipesFiltered=[];
         main.innerHTML = ``;
-        displayRecipe(allRecipes) ; } //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes   
+        allRecipesFiltered=[];
+        if(tagRecipe.length == false){
+            displayRecipe(allRecipes)
+        } 
+        else {
+            displayRecipe(tagRecipe)
+        }
+
+    } 
+    //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes   
     if (event.keyCode == 8){
         --counter// si backspace on décrémente 
          
         if (counter < 0){ counter = 0;} // empeche de passer counter en negatif 
     }
     if (counter >= 3){  // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
-        directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
-        searchValue=directInput;
-        /* on vide les arrays car ils ne correspondent plus à la recherche
-            ils seront remplis au display des recetes filtrées */
-        IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];allRecipesFiltered=[];
-        filterTop(directInput);
+            directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+            searchValue=directInput;
+            /* on vide les arrays car ils ne correspondent plus à la recherche
+                ils seront remplis au display des recetes filtrées */
+            IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];allRecipesFiltered=[];
+
+        if(tagRecipe.length == false){
+            filterTop(directInput,allRecipes);
+        } 
+        else {
+            filterTop(directInput,tagRecipe);
+        }
     }  
 })
  // Fonction de filtre suite a la saisie
-function filterTop(a){
-    allRecipes.forEach(recette => {
+function filterTop(a,b){
+    b.forEach(recette => {
         var ingredInclude = false;
         var nameDescInclude = false;
         var name= recette.name.toLowerCase();
@@ -239,7 +254,7 @@ function tagCheck(a){
             tagRecipe.push(recipe)} 
     }); 
     displayRecipe(tagRecipe);
-    checkIfEmpty()
+    checkIfEmpty();
 } 
 function checkfiltreColor(color){
     var a;
