@@ -32,7 +32,6 @@ fetch('recipes.json')
         allRecipes = data.recipes;
         displayRecipe(allRecipes) ;
 });
-    ////////  affichage Principal des plats avec Littéraux de gabarits 
 function displayRecipe(recipes){ 
     IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];
     main.innerHTML =``; // vide l'affichage précédent
@@ -55,7 +54,7 @@ function displayRecipe(recipes){
         a.forEach(function(ingre){
             if (ingre.hasOwnProperty("quantity") && ingre.hasOwnProperty("unit")){
                 document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity} ${ingre.unit}</br> `;
-                search (ingre.ingredient,"ingredient"); //envoie l'ingrédient dans la liste de
+                search (ingre.ingredient,"ingredient"); 
             }
             else if (ingre.hasOwnProperty("unit") == false && ingre.hasOwnProperty("quantity")){
                 document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity}  </br> `
@@ -84,19 +83,18 @@ searchTop.addEventListener("keyup", function(event) {
         }
 
     } 
-    //si on appuie sur backspace et que le compteur est a 1 on affiche toutes les recettes   
-    if (event.keyCode == 8){
-        --counter// si backspace on décrémente 
-         
-        if (counter < 0){ counter = 0;} // empeche de passer counter en negatif 
+
+    if (event.keyCode == 8){ //8 = backspace
+        --counter
+        if (counter < 0){ 
+            counter = 0;
+        } 
     }
     if (counter >= 3){  // valeur lue uniquement si il y a 3 caractères ou + (é/è/à compris)
             directInput = searchTop.value.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             searchValue=directInput;
-            /* on vide les arrays car ils ne correspondent plus à la recherche
-                ils seront remplis au display des recetes filtrées */
+           // on vide les arrays car ils ne correspondent plus à la recherche ils seront remplis au display des recetes filtrées 
             IngredTable=[]; AppTable=[]; UstArray=[]; UstTable=[];allRecipesFiltered=[];
-
         if(tagRecipe.length == false){
             filterTop(directInput,allRecipes);
         } 
@@ -113,17 +111,18 @@ function filterTop(a,b){
         var name= recette.name.toLowerCase();
         var desc= recette.description.toLowerCase();
         var ingredients= recette.ingredients;
-        // si le nom ou la description incluent la recherche
-        if(name.includes(a) || desc.includes(a)){
-                nameDescInclude = true;
-        }       
+
         ingredients.forEach(ingred =>{   
-            var ingredient = ingred.ingredient  
-            // si les ingrédients inclus la recherche      
+            var ingredient = ingred.ingredient.toLowerCase();  
             if(ingredient.includes(a)){
                 ingredInclude = true ;
             } 
         });
+        
+        if(name.includes(a) || desc.includes(a)){
+                nameDescInclude = true;
+        }  
+
         if (nameDescInclude == true || ingredInclude == true){
             if(allRecipesFiltered.includes(recette) == false){
                  allRecipesFiltered.push(recette);
@@ -134,7 +133,7 @@ function filterTop(a,b){
     displayRecipe(allRecipesFiltered);
     checkIfEmpty(); 
 } 
-    //////// verifie si main et vide => affiche un message d erreur
+    
 function checkIfEmpty(){
     if (main.hasChildNodes()== false) {
         document.getElementById("listRecipes").innerHTML = `<p id="error">Aucune recette ne correspond à votre critère... 
@@ -155,10 +154,10 @@ function search(a,source){
 }
     // fonction qui cherche tous les tags ustensiles pour les mettre en array
 function  CreateUstList(ust){
-    UstArray.push(ust) // recup un Ustarray rempli avec des tableaux d'ustensiles
+    UstArray.push(ust) 
     searchUst();
 }
-function searchUst(){  // 2 boucles pour chercher les valeurs dans les arrays
+function searchUst(){ 
     UstArray.forEach(function(a){
         a.forEach(function(b){
             var lower= b.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
@@ -171,7 +170,7 @@ function searchUst(){  // 2 boucles pour chercher les valeurs dans les arrays
     //////// fonction qui map les tag de chaque catégories au clic sur la fleche vers le bas
 function display(formColor,btn,color){
     document.getElementById(formColor).classList.remove('miniform');
-    document.getElementById(formColor).classList.add('maxiform'); // permet d'afficher
+    document.getElementById(formColor).classList.add('maxiform');
     document.getElementById(btn).innerHTML = `<i class="fa-solid fa-angle-up"  onclick="closeTagList('${formColor}','${btn}','${color}')"></i>`;
 
     if(color == "blue"){ 
@@ -190,20 +189,17 @@ function display(formColor,btn,color){
             return listDesign(listUst,color)}).join('')}` 
     }
 }
-    // fonction qui liste les tags avec les bon parametres
 function listDesign(a,color){
     if(color == "blue"){ return `<li id="${a}List" onclick="filterTag( '${a}','blue');addFilter('${a}') ; closeTagList('formBlue','buttonDownBlue','blue'); cleanTagInput('blue')">${a} </li>`}  
     if(color == "green"){return `<li id="${a}List" onclick="filterTag( '${a}','green');addFilter('${a}') ; closeTagList('formGreen','buttonDownGreen','green');cleanTagInput('green')">${a} </li>` }  
     if(color == "red"){  return `<li id="${a}List" onclick="filterTag( '${a}','red');addFilter('${a}');closeTagList('formRed','buttonDownRed','red');cleanTagInput('red')">${a} </li>`  }  
 }
-    // fonction qui ferme les listes de tags
 function closeTagList(formColor,btn,color){ 
     document.getElementById(formColor).classList.remove('maxiform');
     document.getElementById(formColor).classList.add('miniform');
     document.getElementById(btn).innerHTML = `<i class="fa-solid fa-angle-down"  onclick="display('${formColor}','${btn}','${color}')"></i>`;
     document.getElementById(color).innerHTML = ``;
 } 
-    //////// filter Tags
 function filterTag(tag, color){ 
     var tagList = document.getElementById(tag+'List');
     tagList.removeAttribute("onclick");
@@ -226,15 +222,14 @@ function addFilter(id){
 }
 function removeFilter(id){
     filterValue.pop(id);
-    if(counter>=3){ tagCheck(allRecipesFiltered) }
+    if(counter=0) {displayRecipe(allRecipes)}
+    else if(counter>=3){ tagCheck(allRecipesFiltered) }
     else if(counter<3){ tagCheck(allRecipes) }
     
 }
-    //////// verifie si un tag est selectionné
 function tagCheck(a){
-    // fonction qui compare les arrays
     tagRecipe=[];
-    let valueChecker = (array,tags) => tags.every(e => array.includes(e)); 
+    let valueChecker = (array,tags) => tags.every(e => array.includes(e));     // fonction qui compare les arrays
     a.forEach(recipe => { 
         var filterlistRecipe=[] ;
         var ingredients = recipe.ingredients;
@@ -274,7 +269,7 @@ function checkfiltreColor(color){
         listernerFiltre (a,b,formRed,btnDownRed,red);
     }  
 }
-//////// Fonction d'ecoute de la saisie de la recherche principale
+//////// Fonction d'ecoute de la saisie de la recherche secondaire (tags)
 function listernerFiltre (source,table,formColor,btn,color) {
     source.addEventListener("keyup", function(event) {
        
@@ -307,7 +302,6 @@ function threeLetterFilter(table,formColor,btn,color){
     if (color == "red"){ UstTable = tampon; };
     display(formColor,btn,color);
 }
-/////// fontcion qui nettoie la saisie des tag apres le clic
 function cleanTagInput(color){
     if(color = "blue" ){ 
         document.getElementById("searchBlue").value = "";
