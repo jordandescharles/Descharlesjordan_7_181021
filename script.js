@@ -1,18 +1,18 @@
-var allRecipes = [];
-var allRecipesFiltered=[];
-var IngredTable = [];
-var AppTable  = [];
-var UstTable = [];
-var UstArray = [];
-var searchValue;
-var filterValue= [];
-var all = []; ;
-var searchTop =document.getElementById("searchTop");
-var counter = 0;
-var counterFilter = 0;
-var directInput =""; 
-var inputFilter ="";
-var tagRecipe =[];
+let allRecipes = [];
+let allRecipesFiltered=[];
+let IngredTable = [];
+let AppTable  = [];
+let UstTable = [];
+let UstArray = [];
+let searchValue;
+let filterValue= [];
+let all = []; ;
+let searchTop =document.getElementById("searchTop");
+let counter = 0;
+let counterFilter = 0;
+let directInput =""; 
+let inputFilter ="";
+let tagRecipe =[];
 const main = document.getElementById("listRecipes");
 const formBlue = "formBlue";
 const btnDownBlue = "buttonDownBlue";
@@ -50,7 +50,7 @@ function displayRecipe(recipes){
             </div>
         </article>`    
         // permet de verifier si les ingrédients ont une quantité et une unité puis les affiches
-        var a = recipe.ingredients;
+        let a = recipe.ingredients;
         a.forEach(function(ingre){
             if (ingre.hasOwnProperty("quantity") && ingre.hasOwnProperty("unit")){
                 document.getElementById(recipe.id).innerHTML +=`<strong>${ingre.ingredient}</strong> : ${ingre.quantity} ${ingre.unit}</br> `;
@@ -72,10 +72,10 @@ searchTop.addEventListener("keyup", function(event) {
     if (event.keyCode >= 65 && event.keyCode <= 90  || event.keyCode ==50 || event.keyCode ==55 || event.keyCode==48){ 
         ++ counter; } 
 
-    if (event.keyCode == 8 && counter <= 3){
+    if (counter <= 3){
         main.innerHTML = ``;
         allRecipesFiltered=[];
-        if(tagRecipe.length == false){
+        if(filterValue.length == false){
             displayRecipe(allRecipes)
         } 
         else {
@@ -106,14 +106,14 @@ searchTop.addEventListener("keyup", function(event) {
  // Fonction de filtre suite a la saisie
 function filterTop(a,b){
     b.forEach(recette => {
-        var ingredInclude = false;
-        var nameDescInclude = false;
-        var name= recette.name.toLowerCase();
-        var desc= recette.description.toLowerCase();
-        var ingredients= recette.ingredients;
+        let ingredInclude = false;
+        let nameDescInclude = false;
+        let name= recette.name.toLowerCase();
+        let desc= recette.description.toLowerCase();
+        let ingredients= recette.ingredients;
 
         ingredients.forEach(ingred =>{   
-            var ingredient = ingred.ingredient.toLowerCase();  
+            let ingredient = ingred.ingredient.toLowerCase();  
             if(ingredient.includes(a)){
                 ingredInclude = true ;
             } 
@@ -142,7 +142,7 @@ function checkIfEmpty(){
 }
     //////// fonction qui cherche tous les tags ingredient ou appareils pour les mettre en array
 function search(a,source){
-    var lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+    let lower= a.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
     if(source == "ingredient"){
         if(IngredTable.includes(lower)==false){
             IngredTable.push(lower);
@@ -160,7 +160,7 @@ function  CreateUstList(ust){
 function searchUst(){ 
     UstArray.forEach(function(a){
         a.forEach(function(b){
-            var lower= b.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
+            let lower= b.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
             if(UstTable.includes(lower)==false){
                  UstTable.push(lower);
              }
@@ -201,13 +201,13 @@ function closeTagList(formColor,btn,color){
     document.getElementById(color).innerHTML = ``;
 } 
 function filterTag(tag, color){ 
-    var tagList = document.getElementById(tag+'List');
+    let tagList = document.getElementById(tag+'List');
     tagList.removeAttribute("onclick");
     tagList.classList.add("disabled");
     document.getElementById("tags").innerHTML += `<span class="tagSelected ${color}" id="${tag}">${tag}<i class="fa-regular fa-circle-xmark" onclick="closeFilterTag('${tag}','${color}'); removeFilter('${tag}')"></i></span>`;
 }
 function closeFilterTag(tag, color){
-    var tagList = document.getElementById(tag+'List');
+    let tagList = document.getElementById(tag+'List');
     document.getElementById(tag).remove();
     if(tagList != null){
         tagList.classList.remove("disabled");
@@ -222,19 +222,18 @@ function addFilter(id){
 }
 function removeFilter(id){
     filterValue.pop(id);
-    if(counter=0) {displayRecipe(allRecipes)}
-    else if(counter>=3){ tagCheck(allRecipesFiltered) }
-    else if(counter<3){ tagCheck(allRecipes) }
+     if(counter>=3){ tagCheck(allRecipesFiltered) }
+     if(counter<3){ tagCheck(allRecipes) }
     
 }
 function tagCheck(a){
     tagRecipe=[];
     let valueChecker = (array,tags) => tags.every(e => array.includes(e));     // fonction qui compare les arrays
     a.forEach(recipe => { 
-        var filterlistRecipe=[] ;
-        var ingredients = recipe.ingredients;
-        var appliance = recipe.appliance;
-        var ustensils= recipe.ustensils;
+        let filterlistRecipe=[] ;
+        let ingredients = recipe.ingredients;
+        let appliance = recipe.appliance;
+        let ustensils= recipe.ustensils;
         // permet de mettre tous les ingredients ustensiles et appareils de la recette en un array pour comparer
         ingredients.forEach(e => { 
             e = e.ingredient.toLowerCase().replace(/[éêëè]/g,'e').replace(/[àäâ]/g, 'a').replace(/["'"]/g,' ').replace(/["îï"]/g,'i');
@@ -252,7 +251,7 @@ function tagCheck(a){
     checkIfEmpty();
 } 
 function checkfiltreColor(color){
-    var a;
+    let a;
     if(color = "blue" ){ 
         a = document.getElementById("searchBlue");
         b = IngredTable;
@@ -291,7 +290,7 @@ function listernerFiltre (source,table,formColor,btn,color) {
     }) 
 }
 function threeLetterFilter(table,formColor,btn,color){
-    var tampon = [];
+    let tampon = [];
     table.forEach(e => {
         if(e.includes(inputFilter)){
             tampon.push(e);
